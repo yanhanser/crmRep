@@ -5,6 +5,7 @@
 	要把指定文件加入到仓库中
 2.comit and push
 	本地上传
+	
 3.pull
 
 修改
