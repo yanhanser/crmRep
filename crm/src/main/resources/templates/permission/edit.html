@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+  <legend>修改权限</legend>
+</fieldset>
+	<form class="layui-form" action="">
+  <div class="layui-form-item">
+    <label class="layui-form-label">url</label>
+    <div class="layui-input-inline">
+      <input type="text" name="url" value="${permission.url}" required  lay-verify="required" placeholder="请输入url" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">类型</label>
+    <div class="layui-input-inline">
+      <select name="type" lay-verify="required">
+      <#if permission.type=1>
+	      <option value="1">菜单</option>
+	      <option value="2">按钮</option>
+      </#if>
+      <#if permission.type=2>
+      	  <option value="2">按钮</option>
+	      <option value="1">菜单</option> 
+      </#if>
+      </select>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">权限名</label>
+    <div class="layui-input-inline">
+      <input type="text" name="name" value="${permission.name}" required  lay-verify="required" placeholder="请输入权限名" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">permission</label>
+    <div class="layui-input-inline">
+      <input type="text" name="permission" value="${permission.permission}" required  lay-verify="required" placeholder="请输入permission" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">父权限</label>
+    <div class="layui-input-inline">
+      <select name="parent">
+      <!-- 有父权限 -->
+      
+      </select>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+  </div>
+  <input type="hidden" name="id" value="${permission.id}">
+</form>
+ 
+<script>
+//Demo
+layui.use('form', function(){
+  var form = layui.form;
+  
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+   //layer.msg(JSON.stringify(data.field));
+   
+   //使用ajax进行异步修改权限
+   $.ajax({
+	   url:'permission/update',
+	   data:data.field,
+	   type:"post",
+	   dataType:"JSON",
+	   success:function(data){
+		   
+		   if(data.res>0){
+			   //添加成功
+			   layer.msg("修改成功");
+			   
+			   setTimeout(function(){
+				   showView("permission/list");
+			   },2000)
+			   
+		   }else{
+			   //添加失败
+			   alert("修改失败");
+		   }
+
+	   },
+	   error:function(){
+		   
+	   }
+   });
+
+    return false;
+  });
+  
+//使用ajax获取所有的一级权限
+  $.ajax({
+  	url:'permission/getAll',
+  	data:{},
+  	type:"post",
+  	dataType:"JSON",
+  	success:function(data){
+  		
+  		var html = "<#if !permission.parent?? && !permission.perTowName??>"
+  				+"<option value=''>选择父权限</option>"
+  				+"<#else>"
+  				+"<option value='${permission.parent}'>${permission.perTowName}</option>"
+  				+"</#if>";  
+  		
+  		$.each(data,function(index,item){
+  			
+  			html+="<option value=\""+item.id+"\">"+item.name+"</option>";
+
+  		});
+  		
+  		$("select[name='parent']").html(html);
+  		form.render('select');//刷新select选择框渲染
+  	},
+  	error:function(){
+  		
+  	}
+  	
+  	
+  });
+
+  
+  
+  
+});
+
+
+
+</script>
+</body>
+</html>

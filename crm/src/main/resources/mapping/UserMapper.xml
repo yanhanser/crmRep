@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.st.crm.mapper.UserMapper">
+	
+	<!-- 建立映射关系 -->
+	<!-- 先建立用户和角色之间的关系 -->
+	<resultMap type="com.st.crm.pojo.User" id="user">
+		<id column="id" property="id"/>
+		<result column="username" property="username"/>
+		<result column="password" property="password"/>
+		<result column="realname" property="realname"/>
+		<result column="phone" property="phone"/>
+		<result column="email" property="email"/>
+		<result column="email" property="email"/>
+		
+		<!-- 用户和角色，多对多的映射 -->
+		<collection property="roles" ofType="com.st.crm.pojo.SysRole">
+			<id column="role_id" property="id"/>
+			<result column="role" property="role"/>
+			<result column="dscb" property="dscb"/>
+			
+			<!-- 角色和权限，多对多的映射 -->
+			<collection property="permissions" ofType="com.st.crm.pojo.SysPermission">
+				<id column="permission_id" property="id"/>
+				<result column="url" property="url"/>
+				<result column="type" property="type"/>
+				<result column="name" property="name"/>
+				<result column="permission" property="permission"/>
+				<result column="parent" property="parent"/>
+			</collection>
+		</collection>
+	
+	</resultMap>
+
+
+	<select id="select"
+	parameterType="com.st.crm.pojo.User"
+	resultMap="user">
+	select `user`.*,
+	sys_role.id as  role_id,sys_role.role,sys_role.dscb,
+	sys_permission.id as permission_id,sys_permission.url,
+	sys_permission.type,sys_permission.name,sys_permission.permission,
+	sys_permission.parent
+	from `user`
+	LEFT JOIN sys_user_role on `user`.id=sys_user_role.user_id
+	LEFT JOIN sys_role on sys_user_role.role_id=sys_role.id
+	LEFT JOIN sys_role_permission on sys_role.id=sys_role_permission.role_id
+	LEFT JOIN sys_permission on sys_role_permission.permission_id= sys_permission.id
+	
+	where username=#{username} and `password`=#{password}
+	
+	GROUP BY sys_permission.id
+	
+	</select>
+	
+	<select id="selectAll"
+	resultType="com.st.crm.pojo.User">
+	
+	select * from user
+	
+	</select>
+	
+	<!-- 通过用户的id查询用户的信息 -->
+	<select id="selectById"
+	resultType="com.st.crm.pojo.User">
+	
+	select * from user where id = #{id}
+	
+	</select>
+	
+	<!--根据用户的id修改用户的状态信息  -->
+	<update id="updateById">
+	
+	update `user` set `status` = #{status} where id = #{id}
+	
+	</update>
+	
+	<select id="selectByName"
+	resultType="com.st.crm.pojo.User">
+	
+	select * from `user` where username = #{username}
+	
+	</select>
+	
+	<!-- 添加用户 -->
+	<insert id="insert"
+	parameterType="com.st.crm.pojo.User">
+	
+	insert into `user` (username,password,realname,phone,email,status)
+	value(#{username},#{password},#{realname},#{phone},#{email},#{status})
+	
+	</insert>
+	<!-- 修改用户的信息 -->
+	<update id="updateUser"
+	parameterType="com.st.crm.pojo.User">
+	
+	update `user` set username=#{username},password=#{password},
+	realname=#{realname},phone=#{phone},email=#{email},status=#{status}
+	where id=#{id}
+	</update>
+	<!-- 根据用户的id删除用户信息 -->
+	<delete id="deleteById">
+	
+	delete from `user` where id = #{id}
+	
+	</delete>
+
+</mapper>

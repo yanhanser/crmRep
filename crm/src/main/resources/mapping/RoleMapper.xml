@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.st.crm.mapper.RoleMapper">
+	<!-- 查询所有的角色信息 -->
+	<select id="selectAll"
+	resultType="com.st.crm.pojo.SysRole">
+	select * from sys_role
+	</select>
+	<!-- 添加角色信息 -->
+	<insert id="insert"
+	parameterType="com.st.crm.pojo.SysRole">
+	
+	insert into sys_role (role,dscb)
+	value(#{role},#{dscb}) 
+	
+	</insert>
+	<!-- 根据角色名查找角色信息 -->
+	<select id="selectByRole"
+	resultType="com.st.crm.pojo.SysRole">
+	select * from sys_role where role = #{role}
+	</select>
+	<!-- 根据角色的id删除角色的信息 -->
+	<delete id="deleteById">
+	delete from sys_role where id = #{id}
+	</delete>
+	<!-- 根据角色id查询角色信息 -->
+	<select id="selectById"
+	resultType="com.st.crm.pojo.SysRole">
+	select * from sys_role where id = #{id}
+	</select>
+	<!-- 根据角色的id修改角色的信息 -->
+	<update id="update"
+	parameterType="com.st.crm.pojo.SysRole">
+	update sys_role set role = #{role},dscb = #{dscb}
+	where id = #{id}
+	</update>
+
+</mapper>

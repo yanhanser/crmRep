@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+  <legend>设置角色权限</legend>
+</fieldset> 	
+<form class="layui-form" action="">
+  <div class="layui-form-item">
+    <label class="layui-form-label">角色名</label>
+    <div class="layui-input-inline">
+      <input type="text" name="role" value="${role.role}" required  lay-verify="required"  autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-btn-container">
+	  <div class="layui-input-block">
+		  <button type="button" class="layui-btn" onclick="getData()">保存角色权限</button>
+	  </div>
+	</div>
+	<div class="layui-input-block">
+		<div id="test7" class="demo-transfer"></div>
+	</div>
+  </form>
+	
+  
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+layui.use(['transfer', 'layer', 'util'], function(){
+  $ = layui.$
+  ,transfer = layui.transfer
+  ,layer = layui.layer
+  ,util = layui.util;
+
+  //实例调用
+  transfer.render({
+    elem: '#test7'
+    ,data: []
+    ,id: 'key123' //定义唯一索引
+    ,title:['可选权限', '当前权限']
+  })
+  //批量办法定事件
+  //util.event('lay-demoTransferActive', {
+   
+  //});
+	//使用ajax获取所有的角色
+	$.ajax({
+		url:"permission/list",
+		data:{},
+		type:"POST",
+		dataType:"JSON",
+		success:function(permissionList){
+			
+			//这个位置先不进行加载，等将value中的值确定下来一起进行加载数据
+			
+			//获取当前角色的权限，并且移动到右边
+			//使用ajax进行获取
+			$.ajax({
+				url:"role/permission/get",
+				data:{"id":${role.id}},
+				type:"POST",
+				dataType:"JSON",
+				success:function(data){
+					//创建一个新的数组
+					//数组的目的：为了存放用户的角色信息
+					var permissions = new Array();
+					//遍历后台查询的用户角色
+					$.each(data,function(index,item){
+						
+						//将遍历的用户角色全部放入数组中
+						permissions.push(item.permission_id);
+						
+					});
+					//遍历结束后，将数组permissions里面的数据，通过刷新的方式重新设置values值
+					//前面先不进行加载，value值确定之后同时进行加载
+					transfer.reload('key123', {
+						//重新设置data的值,但是不符合规范
+						 data:permissionList.data
+						 ,value:permissions
+						 //将data.data翻译成符合规范的类型
+						 ,parseData: function(res){
+							    return {
+							      "value": res.id //数据值
+							      ,"title": res.name //数据标题
+							      ,"disabled": "" //是否禁用,如果没有规定可以设置为空
+							      ,"checked": "" //是否选中，如果没有规定可以设置为空
+							    }
+							  }
+						 
+						});
+		
+				},
+				error:function(){
+					
+				}
+				
+			});
+			
+		},
+		error:function(){
+			
+		}
+		
+		
+	});
+	
+  
+});
+
+function getData(){
+	var getData = transfer.getData('key123'); //获取右侧数据
+    
+    //layer.alert(JSON.stringify(getData)); 
+    
+    //console.log(getData);
+    
+    var permissionID = new Array(); 
+    
+    $.each(getData,function(index,item){
+		
+  	  permissionID.push(item.value);
+  	  
+    });
+    //通过ajax传递到服务器，修改用户角色表中的数据
+    $.ajax({
+  	  url:"role/permission/update",
+  	  data:{"permission_id":permissionID,"role_id":${role.id}},
+  	  type:"POST",
+  	  dataType:"JSON",
+  	  success:function(data){
+  		  if(data.code>0){
+  			  //权限修改成功
+  			  layer.msg("设置权限成功");
+  			  
+  			  setTimeout(function(){
+  				  
+  				  showView("role/index");
+  				  
+  			  },2000);
+  			  
+  		  }else{
+  			  //角色修改失败
+  			  layer.msg(data.msg);
+  		  }
+  		  
+  	  },
+  	  error:function(){
+  		  
+  	  }
+    });
+	
+	
+}
+
+
+
+
+</script>
+  
+</body>
+</html>
