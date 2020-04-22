@@ -13,7 +13,7 @@
 		<result column="realname" property="realname"/>
 		<result column="phone" property="phone"/>
 		<result column="email" property="email"/>
-		<result column="email" property="email"/>
+		<result column="status" property="status"/>
 		
 		<!-- 用户和角色，多对多的映射 -->
 		<collection property="roles" ofType="com.st.crm.pojo.SysRole">

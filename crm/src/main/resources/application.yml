@@ -24,3 +24,7 @@ spring:
 mybatis:
   mapper-locations:
   - classpath:/mapping/*.xml
+  
+#Mybatis的驼峰命名方式  
+  configuration:
+    map-underscore-to-camel-case: true
